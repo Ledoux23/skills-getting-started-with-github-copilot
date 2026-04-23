@@ -18,13 +18,39 @@ document.addEventListener("DOMContentLoaded", () => {
         const activityCard = document.createElement("div");
         activityCard.className = "activity-card";
 
-        const spotsLeft = details.max_participants - details.participants.length;
+          // Create participants list HTML
+          let participantsHTML = "";
+          if (details.participants && details.participants.length > 0) {
+            participantsHTML = `
+              <div class="participants-section">
+                <strong>Participants:</strong>
+                <ul class="participants-list no-bullets">
+                  ${details.participants.map(p => `
+                    <li class="participant-item">
+                      <span class="participant-name">${p}</span>
+                      <span class="delete-participant" title="Désinscrire" data-activity="${encodeURIComponent(name)}" data-email="${encodeURIComponent(p)}">✖</span>
+                    </li>
+                  `).join("")}
+                </ul>
+              </div>
+            `;
+          } else {
+            participantsHTML = `
+              <div class="participants-section empty">
+                <strong>Participants:</strong>
+                <span class="no-participants">Aucun inscrit pour le moment</span>
+              </div>
+            `;
+          }
+          `;
+        }
 
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
+          ${participantsHTML}
         `;
 
         activitiesList.appendChild(activityCard);
@@ -62,6 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        fetchActivities(); // Met à jour la liste après inscription
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
